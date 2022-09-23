@@ -1,3 +1,4 @@
+from ast import Continue
 from cProfile import label
 from multiprocessing.sharedctypes import Value
 from PIL import ImageFont, ImageDraw, Image
@@ -11,11 +12,11 @@ import cv2 as cv
 import csv
 
 
-def textLoader():
+def textLoader(path):
 
     drawn_text = ""
 
-    directory = '/home/zule/anaconda3/envs/AlpNum/AlpNums/Text_files/'
+    directory = path + 'Text_files/'
 
     for filename in os.listdir(directory):
 
@@ -37,11 +38,7 @@ def imageRenderText(string):
         print("Cant get image text!")
 
 
-
-
 # Checks .ttf file for given char, if char is not defined in cmap, returns false
-
-
 def char_in_font(unicode_char, font):
     for cmap in font['cmap'].tables:
         if cmap.isUnicode():
@@ -60,24 +57,24 @@ def rowZeroArray():
     return rowZero
 
 
-def imageRenderFont():
+def imageRenderFont(my_path):
 
     font_label_dict = {}
 
-    with open('/home/zule/anaconda3/envs/AlpNum/AlpNums/dataset_table.csv', 'w', newline='') as dataset_file:
+    with open('dataset_table.csv', 'w+', newline='') as dataset_file:
 
         writer = csv.writer(dataset_file)
         writer.writerows([rowZeroArray()])
 
         # Checking important dirs, and adding relativ path for directory
-        if path.exists("/home/zule/anaconda3/envs/AlpNum/AlpNums/Fonts") == False:
+        if path.exists(my_path + "/Fonts") == False:
             print('There is no "Fonts" directory in AlpNumsEnv.\nCreate "Fonts" directory add ".ttf" files and try again.')
             exit()
 
-        directory = '/home/zule/anaconda3/envs/AlpNum/AlpNums/Fonts'
+        directory = my_path + '/Fonts'
 
-        if path.exists("/home/zule/anaconda3/envs/AlpNum/AlpNums/Renders/") == False:
-            os.mkdir("/home/zule/anaconda3/envs/AlpNum/AlpNums/Renders/")
+        if path.exists(my_path + "/Renders/") == False:
+            os.mkdir(my_path + "/Renders/")
 
         # Delete this var, this is only for labeling fonts
         numerical_label = -1
@@ -100,7 +97,7 @@ def imageRenderFont():
                 try:
 
                     # Adding diffrent size of the fonts, for diverse sizes
-                    for fontSizeIterations in range(0, 5):
+                    for fontSizeIterations in range(0, 2):
                         
                         randomFontSize = random.randrange(20, 24)
                         randomXDraw = random.randrange(0, 120)
@@ -111,7 +108,7 @@ def imageRenderFont():
 
                         # Iterates trough ASCII printable chars, and draws a picture for every sign
 
-                        for c in range(33, 127, 1):  # range is 33 to 127 for all chars
+                        for c in range(33, 34, 1):  # range is 33 to 127 for all chars
                             
                             # Char we want to draw on image,
                             drawnChar = chr(c)
@@ -131,7 +128,7 @@ def imageRenderFont():
                             draw.text((randomXDraw, 0), drawnChar,
                                       font=font, fill=color)
 
-                            # NameOfImage = str(str(filename[:-4]) + stringOfChar + strRandomFontSize +'.png') #Needs to have '.png' to work
+                            # NameOfImageNeeds to have '.png' to work
                             # Needs to have '.png' to work
                             NameOfImage = str(
                                 str(filename) + str(num_of_image) + '.png')
@@ -145,7 +142,9 @@ def imageRenderFont():
                                 np.array(image), cv.COLOR_RGB2BGR)
                             cv_image_gs = cv.cvtColor(cv_image, cv.COLOR_BGR2GRAY)
                             cv_image_gs = ~cv_image_gs
-                            #cv.imwrite("/home/zule/anaconda3/envs/AlpNum/AlpNums/Renders/" + NameOfImage, cv_image_gs)
+
+                            #To write images enable this part
+                            #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                             image_array = np.asarray(cv_image_gs)
 
@@ -162,7 +161,6 @@ def imageRenderFont():
                 try:
 
                     for fontSizeIterations in range(0, 5):
-                        
                         randomFontSize = random.randrange(20, 24)
                         randomXDraw = random.randrange(0, 30)
 
@@ -174,7 +172,7 @@ def imageRenderFont():
 
                         draw = ImageDraw.Draw(image)
 
-                        imageText = imageRenderText(textLoader())
+                        imageText = imageRenderText(textLoader(my_path))
 
                         draw.text((randomXDraw, 0), imageText,
                                   font=font, fill=color)
@@ -188,7 +186,9 @@ def imageRenderFont():
                             np.array(image), cv.COLOR_RGB2BGR)
                         cv_image_gs = cv.cvtColor(cv_image, cv.COLOR_BGR2GRAY)
                         cv_image_gs = ~cv_image_gs
-                        #cv.imwrite("/home/zule/anaconda3/envs/AlpNum/AlpNums/Renders/" + NameOfImage, cv_image_gs)
+
+                        #To write images enable this part
+                        #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                         image_array = np.asarray(cv_image_gs)
 
@@ -204,7 +204,7 @@ def imageRenderFont():
 
     dataset_file.close()
 
-    with open('/home/zule/anaconda3/envs/AlpNum/AlpNums/font_labels.csv', 'w', newline='') as font_csv:
+    with open(my_path + '/font_labels.csv', 'w+', newline='') as font_csv:
         
         writer = csv.writer(font_csv)
 
@@ -213,6 +213,37 @@ def imageRenderFont():
             writer.writerow(label_row)
 
 def main():
+
+    menu_option = 0
+    menu_option_1 = ''
+    my_absolute_path = ''
+
+    while True:
+
+        print("Alpha Numerical Image Generator")
+        print("Choose option: ")
+        print("1. Create data")
+        print("2. Exit")
+        menu_option = int(input())
+
+        if menu_option == 1:
+            print("Enter absolute path wehre your directory is: ")
+            my_absolute_path = input()
+
+            print("Is this your path? (y/n)")
+            print(my_absolute_path)
+
+            menu_option_1 = input()
+
+            if menu_option_1 == 'y' or 'Y':
+                imageRenderFont(my_absolute_path)
+            else:
+                Continue
+
+        elif menu_option == 2:
+            exit()
+        else:
+            print("Invalid option, try again!")
     imageRenderFont()
 
 
