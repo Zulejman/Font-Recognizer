@@ -11,15 +11,22 @@ import numpy as np
 import cv2 as cv
 import csv
 
+import tkinter as tk
+from tkinter import filedialog
+
 
 def textLoader(path):
 
     drawn_text = ""
 
-    directory = path + 'Text_files/'
+    directory = path + '/Text_files/'
+
+    #Error not really here
+    #print(directory)
+
 
     for filename in os.listdir(directory):
-
+        print("File name: ", filename)
         with open(directory+filename) as write_text_file:
             for line in write_text_file:
                 drawn_text += line
@@ -68,6 +75,7 @@ def imageRenderFont(my_path):
 
         # Checking important dirs, and adding relativ path for directory
         if path.exists(my_path + "/Fonts") == False:
+            print(my_path)
             print('There is no "Fonts" directory in AlpNumsEnv.\nCreate "Fonts" directory add ".ttf" files and try again.')
             exit()
 
@@ -144,7 +152,7 @@ def imageRenderFont(my_path):
                             cv_image_gs = ~cv_image_gs
 
                             #To write images enable this part
-                            #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
+                            cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                             image_array = np.asarray(cv_image_gs)
 
@@ -173,7 +181,7 @@ def imageRenderFont(my_path):
                         draw = ImageDraw.Draw(image)
 
                         imageText = imageRenderText(textLoader(my_path))
-
+                     
                         draw.text((randomXDraw, 0), imageText,
                                   font=font, fill=color)
 
@@ -188,7 +196,7 @@ def imageRenderFont(my_path):
                         cv_image_gs = ~cv_image_gs
 
                         #To write images enable this part
-                        #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
+                        cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                         image_array = np.asarray(cv_image_gs)
 
@@ -212,42 +220,86 @@ def imageRenderFont(my_path):
             label_row = [key, value]
             writer.writerow(label_row)
 
-def main():
+# def main():
 
-    menu_option = 0
-    menu_option_1 = ''
-    my_absolute_path = ''
+#     menu_option = 0
+#     menu_option_1 = ''
+#     my_absolute_path = ''
 
-    while True:
+#     while True:
 
-        print("Alpha Numerical Image Generator")
-        print("Choose option: ")
-        print("1. Create data")
-        print("2. Exit")
-        menu_option = int(input())
+#         print("Alpha Numerical Image Generator")
+#         print("Choose option: ")
+#         print("1. Create data")
+#         print("2. Exit")
+#         menu_option = int(input())
 
-        if menu_option == 1:
-            print("Enter absolute path wehre your directory is: ")
-            my_absolute_path = input()
+#         if menu_option == 1:
+#             print("Enter absolute path wehre your directory is: ")
+#             my_absolute_path = input()
 
-            print("Is this your path? (y/n)")
-            print(my_absolute_path)
+#             print("Is this your path? (y/n)")
+#             print(my_absolute_path)
 
-            menu_option_1 = input()
+#             menu_option_1 = input()
 
-            if menu_option_1 == 'y' or 'Y':
-                imageRenderFont(my_absolute_path)
-            else:
-                Continue
+#             if menu_option_1 == 'y' or 'Y':
+#                 imageRenderFont(my_absolute_path)
+#             else:
+#                 Continue
 
-        elif menu_option == 2:
-            exit()
-        else:
-            print("Invalid option, try again!")
-    imageRenderFont()
+#         elif menu_option == 2:
+#             exit()
+#         else:
+#             print("Invalid option, try again!")
+#     imageRenderFont()
 
 
-if __name__ == "__main__":
-    main()
+
+def browse_directory():
+    global my_absolute_path
+    my_absolute_path = filedialog.askdirectory()
+    entry_path.delete(0, tk.END)
+    entry_path.insert(0, my_absolute_path)
+
+def start_image_render():
+    my_absolute_path = entry_path.get()
+    imageRenderFont(my_absolute_path)
+
+# Create the main window
+root = tk.Tk()
+root.title("Alpha Numerical Image Generator")
+
+# Create and place the widgets
+label_title = tk.Label(root, text="Alpha Numerical Image Generator", font=("Arial", 16))
+label_title.grid(row=0, column=0, columnspan=2, pady=10)
+
+label_path = tk.Label(root, text="Directory path:")
+label_path.grid(row=1, column=0, sticky="e", pady=5)
+
+entry_path = tk.Entry(root, width=40)
+entry_path.grid(row=1, column=1, sticky="w", pady=5)
+
+button_browse = tk.Button(root, text="Browse", command=browse_directory)
+button_browse.grid(row=1, column=2, padx=10)
+
+button_start = tk.Button(root, text="Create data", command=start_image_render, width=20)
+button_start.grid(row=2, column=0, columnspan=2, pady=10)
+
+button_exit = tk.Button(root, text="Exit", command=root.quit, width=20)
+button_exit.grid(row=3, column=0, columnspan=2, pady=10)
+
+# Main loop
+root.mainloop()
+
+
+
+# if __name__ == "__main__":
+#     main()
+
+
+
+#/home/zule/anaconda3/envs/Alp_num/Font-Recognizer
+
 
 
