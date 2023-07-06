@@ -16,7 +16,7 @@ def textLoader(path):
 
     drawn_text = ""
 
-    directory = path + 'Text_files/'
+    directory = path + '/Text_files/'
 
     for filename in os.listdir(directory):
 
@@ -73,8 +73,8 @@ def imageRenderFont(my_path):
 
         directory = my_path + '/Fonts'
 
-        if path.exists(my_path + "/Renders/") == False:
-            os.mkdir(my_path + "/Renders/")
+        if path.exists(my_path + "/Renders") == False:
+            os.mkdir(my_path + "/Renders")
 
         # Delete this var, this is only for labeling fonts
         numerical_label = -1
@@ -97,7 +97,7 @@ def imageRenderFont(my_path):
                 try:
 
                     # Adding diffrent size of the fonts, for diverse sizes
-                    for fontSizeIterations in range(0, 2):
+                    for fontSizeIterations in range(0, 1):
                         
                         randomFontSize = random.randrange(20, 24)
                         randomXDraw = random.randrange(0, 120)
@@ -160,7 +160,7 @@ def imageRenderFont(my_path):
 
                 try:
 
-                    for fontSizeIterations in range(0, 5):
+                    for fontSizeIterations in range(0, 10):
                         randomFontSize = random.randrange(20, 24)
                         randomXDraw = random.randrange(0, 30)
 
@@ -171,12 +171,12 @@ def imageRenderFont(my_path):
                         image = Image.new("RGB", (224, 28), (255, 255, 255))
 
                         draw = ImageDraw.Draw(image)
-
+                        
+                        #ERROR: Ovdje baca da ne može kreirat sliku.
                         imageText = imageRenderText(textLoader(my_path))
 
                         draw.text((randomXDraw, 0), imageText,
                                   font=font, fill=color)
-
                         NameOfImage = str(
                             str(filename) + str(num_of_image) + '.png')
                         num_of_image += 1
@@ -188,7 +188,7 @@ def imageRenderFont(my_path):
                         cv_image_gs = ~cv_image_gs
 
                         #To write images enable this part
-                        #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
+                        cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                         image_array = np.asarray(cv_image_gs)
 
