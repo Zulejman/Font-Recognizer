@@ -10,7 +10,9 @@ import random
 import numpy as np
 import cv2 as cv
 import csv
-
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import messagebox
 
 def textLoader(path):
 
@@ -68,7 +70,7 @@ def imageRenderFont(my_path):
 
         # Checking important dirs, and adding relativ path for directory
         if path.exists(my_path + "/Fonts") == False:
-            print('There is no "Fonts" directory in AlpNumsEnv.\nCreate "Fonts" directory add ".ttf" files and try again.')
+            messagebox.showerror("Error", 'There is no "Fonts" directory in AlpNumsEnv.\nCreate "Fonts" directory add ".ttf" files and try again.')
             exit()
 
         directory = my_path + '/Fonts'
@@ -97,7 +99,7 @@ def imageRenderFont(my_path):
                 try:
 
                     # Adding diffrent size of the fonts, for diverse sizes
-                    for fontSizeIterations in range(0, 1):
+                    for fontSizeIterations in range(0, 5):
                         
                         randomFontSize = random.randrange(20, 24)
                         randomXDraw = random.randrange(0, 120)
@@ -108,7 +110,7 @@ def imageRenderFont(my_path):
 
                         # Iterates trough ASCII printable chars, and draws a picture for every sign
 
-                        for c in range(33, 34, 1):  # range is 33 to 127 for all chars
+                        for c in range(33, 50, 1):  # range is 33 to 127 for all chars
                             
                             # Char we want to draw on image,
                             drawnChar = chr(c)
@@ -160,7 +162,7 @@ def imageRenderFont(my_path):
 
                 try:
 
-                    for fontSizeIterations in range(0, 10):
+                    for fontSizeIterations in range(0, 5):
                         randomFontSize = random.randrange(20, 24)
                         randomXDraw = random.randrange(0, 30)
 
@@ -212,6 +214,7 @@ def imageRenderFont(my_path):
             label_row = [key, value]
             writer.writerow(label_row)
 
+"""
 def main():
 
     menu_option = 0
@@ -250,4 +253,30 @@ def main():
 if __name__ == "__main__":
     main()
 
+"""
 
+def select_directory():
+    directory = filedialog.askdirectory()
+    directory_entry.delete(0, tk.END)
+    directory_entry.insert(tk.END, directory)
+
+def start_process():
+    directory = directory_entry.get()
+    if directory:
+        imageRenderFont(directory)
+    else:
+        messagebox.showerror("Error", 'No directory selected!')
+
+
+root = tk.Tk()
+
+directory_entry = tk.Entry(root, width=50)
+directory_entry.pack(padx=5, pady=5)
+
+select_button = tk.Button(root, text="Select Directory", command=select_directory)
+select_button.pack(padx=5, pady=5)
+
+start_button = tk.Button(root, text="Start Process", command=start_process)
+start_button.pack(padx=5, pady=5)
+
+root.mainloop()
