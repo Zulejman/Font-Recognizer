@@ -190,7 +190,7 @@ def imageRenderFont(my_path):
                         cv_image_gs = ~cv_image_gs
 
                         #To write images enable this part
-                        cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
+                        #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                         image_array = np.asarray(cv_image_gs)
 
@@ -213,47 +213,6 @@ def imageRenderFont(my_path):
         for key, value in font_label_dict.items():
             label_row = [key, value]
             writer.writerow(label_row)
-
-"""
-def main():
-
-    menu_option = 0
-    menu_option_1 = ''
-    my_absolute_path = ''
-
-    while True:
-
-        print("Alpha Numerical Image Generator")
-        print("Choose option: ")
-        print("1. Create data")
-        print("2. Exit")
-        menu_option = int(input())
-
-        if menu_option == 1:
-            print("Enter absolute path wehre your directory is: ")
-            my_absolute_path = input()
-
-            print("Is this your path? (y/n)")
-            print(my_absolute_path)
-
-            menu_option_1 = input()
-
-            if menu_option_1 == 'y' or 'Y':
-                imageRenderFont(my_absolute_path)
-            else:
-                Continue
-
-        elif menu_option == 2:
-            exit()
-        else:
-            print("Invalid option, try again!")
-    imageRenderFont()
-
-
-if __name__ == "__main__":
-    main()
-
-"""
 
 def select_directory():
     directory = filedialog.askdirectory()
