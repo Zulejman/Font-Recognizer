@@ -11,13 +11,13 @@ import numpy as np
 import cv2 as cv
 import csv
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import messagebox, IntVar, filedialog, StringVar
+import threading
+
 
 def textLoader(path):
 
     drawn_text = ""
-
     directory = path + '/Text_files/'
 
     for filename in os.listdir(directory):
@@ -59,7 +59,7 @@ def rowZeroArray():
     return rowZero
 
 
-def imageRenderFont(my_path):
+def imageRenderFont(my_path, num_images, font_size_range, position_range, ascii_range, save_images):
 
     font_label_dict = {}
 
@@ -99,10 +99,10 @@ def imageRenderFont(my_path):
                 try:
 
                     # Adding diffrent size of the fonts, for diverse sizes
-                    for fontSizeIterations in range(0, 5):
+                    for fontSizeIterations in range(0, num_images):
                         
-                        randomFontSize = random.randrange(20, 24)
-                        randomXDraw = random.randrange(0, 120)
+                        randomFontSize = random.randrange(font_size_range[0], font_size_range[1])
+                        randomXDraw = random.randrange(position_range[0], position_range[1])
 
                         font = ImageFont.truetype(
                             fileNameJoin, size=randomFontSize)
@@ -110,7 +110,7 @@ def imageRenderFont(my_path):
 
                         # Iterates trough ASCII printable chars, and draws a picture for every sign
 
-                        for c in range(33, 50, 1):  # range is 33 to 127 for all chars
+                        for c in range(ascii_range[0], ascii_range[1], 1):  # range is 33 to 127 for all chars
                             
                             # Char we want to draw on image,
                             drawnChar = chr(c)
@@ -146,7 +146,8 @@ def imageRenderFont(my_path):
                             cv_image_gs = ~cv_image_gs
 
                             #To write images enable this part
-                            #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
+                            if save_images:
+                                cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                             image_array = np.asarray(cv_image_gs)
 
@@ -162,9 +163,9 @@ def imageRenderFont(my_path):
 
                 try:
 
-                    for fontSizeIterations in range(0, 5):
-                        randomFontSize = random.randrange(20, 24)
-                        randomXDraw = random.randrange(0, 30)
+                    for fontSizeIterations in range(0, num_images):
+                        randomFontSize = random.randrange(font_size_range[0], font_size_range[1])
+                        randomXDraw = random.randrange(position_range[0], position_range[1])
 
                         font = ImageFont.truetype(
                             fileNameJoin, size=randomFontSize)
@@ -190,7 +191,8 @@ def imageRenderFont(my_path):
                         cv_image_gs = ~cv_image_gs
 
                         #To write images enable this part
-                        #cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
+                        if save_images:
+                            cv.imwrite(my_path + "/Renders/" + NameOfImage, cv_image_gs)
 
                         image_array = np.asarray(cv_image_gs)
 
@@ -213,24 +215,76 @@ def imageRenderFont(my_path):
         for key, value in font_label_dict.items():
             label_row = [key, value]
             writer.writerow(label_row)
-
 def select_directory():
     directory = filedialog.askdirectory()
-    directory_entry.delete(0, tk.END)
-    directory_entry.insert(tk.END, directory)
+    directory_entry.set(directory)
 
 def start_process():
     directory = directory_entry.get()
+    num_images = num_images_entry.get()
+    font_size_start = font_size_start_entry.get()
+    font_size_end = font_size_end_entry.get()
+    position_start = position_start_entry.get()
+    position_end = position_end_entry.get()
+    ascii_start = ascii_start_entry.get()
+    ascii_end = ascii_end_entry.get()
+    save_images = save_images_var.get()
     if directory:
-        imageRenderFont(directory)
+        threading.Thread(target=imageRenderFont, args=(directory, int(num_images), [int(font_size_start), int(font_size_end)], [int(position_start), int(position_end)], [int(ascii_start), int(ascii_end)], bool(save_images))).start()
     else:
-        messagebox.showerror("Error", 'No directory selected!')
+        messagebox.showerror("Error", "No directory selected.")
 
+def stop_process():
+    global stop_requested
+    stop_requested = True
+
+def validate_num(input):
+    if input.isdigit() or input == "":
+        return True
+    return False
 
 root = tk.Tk()
 
-directory_entry = tk.Entry(root, width=50)
-directory_entry.pack(padx=5, pady=5)
+stop_requested = False
+
+directory_entry = StringVar()
+num_images_entry = StringVar()
+font_size_start_entry = StringVar()
+font_size_end_entry = StringVar()
+position_start_entry = StringVar()
+position_end_entry = StringVar()
+ascii_start_entry = StringVar()
+ascii_end_entry = StringVar()
+save_images_var = IntVar()
+
+validate_num_cmd = root.register(validate_num)
+
+tk.Label(root, text="Directory (Must be where all of the files are)").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=directory_entry, width=50).pack(padx=5, pady=5)
+
+tk.Label(root, text="Number of random image iterations").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=num_images_entry, width=50, validate="key", validatecommand=(validate_num_cmd, '%P')).pack(padx=5, pady=5)
+
+tk.Label(root, text="Font Size Start").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=font_size_start_entry, width=50, validate="key", validatecommand=(validate_num_cmd, '%P')).pack(padx=5, pady=5)
+
+tk.Label(root, text="Font Size End").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=font_size_end_entry, width=50, validate="key", validatecommand=(validate_num_cmd, '%P')).pack(padx=5, pady=5)
+
+tk.Label(root, text="Position Start").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=position_start_entry, width=50, validate="key", validatecommand=(validate_num_cmd, '%P')).pack(padx=5, pady=5)
+
+tk.Label(root, text="Position End").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=position_end_entry, width=50, validate="key", validatecommand=(validate_num_cmd, '%P')).pack(padx=5, pady=5)
+
+tk.Label(root, text="ASCII Start").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=ascii_start_entry, width=50, validate="key", validatecommand=(validate_num_cmd, '%P')).pack(padx=5, pady=5)
+
+tk.Label(root, text="ASCII End").pack(padx=5, pady=5)
+tk.Entry(root, textvariable=ascii_end_entry, width=50, validate="key", validatecommand=(validate_num_cmd, '%P')).pack(padx=5, pady=5)
+
+save_images_checkbutton = tk.Checkbutton(root, text="Save Images", variable=save_images_var)
+save_images_checkbutton.pack(padx=5, pady=5)
 
 select_button = tk.Button(root, text="Select Directory", command=select_directory)
 select_button.pack(padx=5, pady=5)
@@ -238,4 +292,10 @@ select_button.pack(padx=5, pady=5)
 start_button = tk.Button(root, text="Start Process", command=start_process)
 start_button.pack(padx=5, pady=5)
 
+stop_button = tk.Button(root, text="Stop Process", command=stop_process)
+stop_button.pack(padx=5, pady=5)
+
 root.mainloop()
+
+
+#Diffrent values for sentence and ascii rendering
