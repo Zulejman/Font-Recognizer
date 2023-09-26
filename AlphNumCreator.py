@@ -215,6 +215,7 @@ def imageRenderFont(my_path, num_images, font_size_range, position_range, ascii_
         for key, value in font_label_dict.items():
             label_row = [key, value]
             writer.writerow(label_row)
+
 def select_directory():
     directory = filedialog.askdirectory()
     directory_entry.set(directory)
@@ -244,6 +245,7 @@ def validate_num(input):
     return False
 
 root = tk.Tk()
+root.title("AlpNum Generator")
 
 stop_requested = False
 
